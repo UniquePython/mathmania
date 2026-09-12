@@ -5,6 +5,7 @@ Mathmania is a small mathematical programming language that can display arbitrar
 ## Example
 
 ```text
+// This is a comment
 show 122333444455555666666777777788888888999999999
 ```
 
@@ -15,6 +16,10 @@ Natural => 122333444455555666666777777788888888999999999
 ```
 
 ## Reference
+
+### Comments
+
+Mathmania supports only single line comments written like `// ...`.
 
 ### Types
 
