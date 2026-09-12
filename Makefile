@@ -39,7 +39,7 @@ SRC_DIR  := src
 BUILD_DIR := build
 BIN_DIR  := bin
 
-TARGET   := $(BIN_DIR)/mica16
+TARGET   := $(BIN_DIR)/mathmania
 
 SRCS     := $(shell find $(SRC_DIR) -name '*.c')
 OBJS     := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
