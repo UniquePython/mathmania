@@ -2,8 +2,8 @@
 #define MATHMANIA_LEXER_H_
 
 #include "mathmania/tokenarray.h"
-#include <stddef.h>
+#include "mathmania/source.h"
 
-TokenArray Lex(const char *source, size_t length);
+TokenArray Lex(Source source);
 
 #endif
