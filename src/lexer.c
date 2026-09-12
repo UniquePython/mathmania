@@ -2,6 +2,13 @@
 #include "mathmania/error.h"
 #include <string.h>
 
+typedef struct
+{
+    Source source;
+    size_t position;
+
+} Lexer;
+
 static inline bool isDigit(char c)
 {
     return c >= '0' && c <= '9';
@@ -22,48 +29,58 @@ static inline bool isWhitespace(char c)
     return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
 
-static void skipWhitespace(Source source, size_t *position)
+static inline bool atEnd(Lexer *lexer)
 {
-    while (*position < source.length)
+    return lexer->position >= lexer->source.length;
+}
+
+static inline char peek(Lexer *lexer)
+{
+    return lexer->source.code[lexer->position];
+}
+
+static void skipWhitespace(Lexer *lexer)
+{
+    while (!atEnd(lexer))
     {
-        char c = source.code[*position];
+        char c = peek(lexer);
 
         if (isWhitespace(c))
             break;
 
-        (*position)++;
+        lexer->position++;
     }
 }
 
-static void skipComment(Source source, size_t *position)
+static void skipComment(Lexer *lexer)
 {
-    *position += 2;
+    lexer->position += 2;
 
-    while (*position < source.length && source.code[*position] != '\n')
-        (*position)++;
+    while (!atEnd(lexer) && peek(lexer) != '\n')
+        lexer->position++;
 }
 
-static void skipIgnored(Source source, size_t *position)
+static void skipIgnored(Lexer *lexer)
 {
     for (;;)
     {
-        skipWhitespace(source, position);
+        skipWhitespace(lexer);
 
-        if (*position + 1 >= source.length || source.code[*position] != '/' || source.code[*position + 1] != '/')
+        if (lexer->position + 1 >= lexer->source.length || peek(lexer) != '/' || lexer->source.code[lexer->position + 1] != '/')
             return;
 
-        skipComment(source, position);
+        skipComment(lexer);
     }
 }
 
-static bool lexNumber(Source source, size_t *position, TokenArray *tokArr)
+static bool lexNumber(Lexer *lexer, TokenArray *tokArr)
 {
-    size_t start = *position;
+    size_t start = lexer->position;
 
-    while (*position < source.length && isDigit(source.code[*position]))
-        (*position)++;
+    while (!atEnd(lexer) && isDigit(peek(lexer)))
+        lexer->position++;
 
-    if (!TokenArrayPush(tokArr, (Token){TK_NATURAL, {start, *position}}))
+    if (!TokenArrayPush(tokArr, (Token){TK_NATURAL, {start, lexer->position}}))
         return false;
 
     return true;
@@ -92,22 +109,22 @@ static TokenKind keywordKind(const char *text, size_t length)
     return TK_COUNT;
 }
 
-static bool lexIdentifier(Source source, size_t *position, TokenArray *tokArr)
+static bool lexIdentifier(Lexer *lexer, TokenArray *tokArr)
 {
-    size_t start = *position;
+    size_t start = lexer->position;
 
-    (*position)++;
+    lexer->position++;
 
-    while (*position < source.length && isIdentifierPart(source.code[*position]))
-        (*position)++;
+    while (!atEnd(lexer) && isIdentifierPart(peek(lexer)))
+        lexer->position++;
 
-    Span span = {start, *position};
+    Span span = {start, lexer->position};
     size_t length = span.end - span.start;
-    TokenKind kind = keywordKind(source.code + start, length);
+    TokenKind kind = keywordKind(lexer->source.code + start, length);
 
     if (kind == TK_COUNT)
     {
-        Error(source, span, "Unknown identifier: '%.*s'", (int)length, source.code + start);
+        Error(lexer->source, span, "Unknown identifier: '%.*s'", (int)length, lexer->source.code + start);
         return false; // unreachable
     }
 
@@ -122,37 +139,37 @@ bool Lex(Source source, TokenArray *tokArr)
     if (tokArr == NULL)
         return false;
 
-    size_t position = 0;
+    Lexer lexer = {source, 0};
 
-    while (position < source.length)
+    while (!atEnd(&lexer))
     {
-        skipIgnored(source, &position);
+        skipIgnored(&lexer);
 
-        if (position >= source.length)
+        if (atEnd(&lexer))
             break;
 
-        char c = source.code[position];
+        char c = peek(&lexer);
 
         if (isDigit(c))
         {
-            if (!lexNumber(source, &position, tokArr))
+            if (!lexNumber(&lexer, tokArr))
                 return false;
         }
 
         else if (isIdentifierStart(c))
         {
-            if (!lexIdentifier(source, &position, tokArr))
+            if (!lexIdentifier(&lexer, tokArr))
                 return false;
         }
 
         else
         {
-            Error(source, (Span){position, position + 1}, "Illegal character: '%c'", c);
+            Error(lexer.source, (Span){lexer.position, lexer.position + 1}, "Illegal character: '%c'", c);
             return false; // Unreachable
         }
     }
 
-    if (!TokenArrayPush(tokArr, (Token){TK_EOF, {source.length, source.length}}))
+    if (!TokenArrayPush(tokArr, (Token){TK_EOF, {lexer.source.length, lexer.source.length}}))
         return false;
 
     return true;
