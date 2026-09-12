@@ -3,7 +3,8 @@
 
 #include "mathmania/tokenarray.h"
 #include "mathmania/source.h"
+#include <stdbool.h>
 
-TokenArray Lex(Source source);
+bool Lex(Source source, TokenArray *tokArr)
 
 #endif
