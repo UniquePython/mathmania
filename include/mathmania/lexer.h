@@ -5,6 +5,6 @@
 #include "mathmania/source.h"
 #include <stdbool.h>
 
-bool Lex(Source source, TokenArray *tokArr)
+bool Lex(Source source, TokenArray *tokArr);
 
 #endif
