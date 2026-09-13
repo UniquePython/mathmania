@@ -19,4 +19,6 @@ typedef struct
 
 } Expr;
 
+void ExprFree(Expr **expr);
+
 #endif

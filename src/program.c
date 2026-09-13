@@ -1,5 +1,6 @@
 #include "mathmania/program.h"
 #include "mathmania/memory.h"
+#include "mathmania/stmtkind.h"
 
 bool ProgramInit(Program *prog)
 {
@@ -17,6 +18,19 @@ void ProgramFree(Program *prog)
 {
     if (prog == NULL)
         return;
+
+    for (size_t i = 0; i < prog->count; i++)
+    {
+        switch (prog->stmts[i].kind)
+        {
+        case SK_SHOW:
+            ExprFree(&prog->stmts[i].as.show.expr);
+            break;
+
+        case SK_COUNT:
+            break;
+        }
+    }
 
     Release(&prog->stmts);
     prog->count = 0;
