@@ -15,6 +15,14 @@ Output:
 Natural => 122333444455555666666777777788888888999999999
 ```
 
+## Usage
+
+```bash
+make clean && make
+echo "show 122333444455555666666777777788888888999999999" >> basic.mm
+./bin/mathmania basic.mm
+```
+
 ## Reference
 
 ### Comments
