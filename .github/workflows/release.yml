@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag is on main
+        run: |
+          git fetch origin main
+          if ! git merge-base --is-ancestor "${{ github.sha }}" origin/main; then
+            echo "Tag ${{ github.ref_name }} is not on main — skipping release."
+            exit 1
+          fi
+
+      - name: Build
+        run: make
+
+      - name: Rename binary for release
+        run: cp bin/mathmania mathmania-${{ github.ref_name }}-linux-x86_64
+
+      - name: Create release and upload binary
+        uses: softprops/action-gh-release@v2
+        with:
+          files: mathmania-${{ github.ref_name }}-linux-x86_64

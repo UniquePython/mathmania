@@ -5,6 +5,7 @@ Mathmania is a small mathematical programming language that can display arbitrar
 ## Example
 
 ```text
+// This is a comment
 show 122333444455555666666777777788888888999999999
 ```
 
@@ -14,7 +15,19 @@ Output:
 Natural => 122333444455555666666777777788888888999999999
 ```
 
+## Usage
+
+```bash
+make clean && make
+echo "show 122333444455555666666777777788888888999999999" >> basic.mm
+./bin/mathmania basic.mm
+```
+
 ## Reference
+
+### Comments
+
+Mathmania supports only single line comments written like `// ...`.
 
 ### Types
 
