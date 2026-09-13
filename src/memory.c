@@ -16,7 +16,7 @@ bool allocate(size_t size, void **out)
 
 bool reallocate(void **ptr, size_t size)
 {
-    if (ptr == NULL || *ptr == NULL || size == 0)
+    if (ptr == NULL || size == 0)
         return false;
 
     void *temp = realloc(*ptr, size);
