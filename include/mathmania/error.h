@@ -3,7 +3,22 @@
 
 #include "mathmania/source.h"
 #include "mathmania/token.h"
+#include <stdbool.h>
 
-void Error(Source source, Span offender, const char *fmt, ...);
+typedef struct
+{
+    bool hasSpan;
+    Source source;
+    Span span;
+    char *message;
+
+} MathmaniaError;
+
+bool MathmaniaErrorNew(Source source, Span span, MathmaniaError *out, const char *fmt, ...);
+bool MathmaniaErrorSimple(MathmaniaError *out, const char *fmt, ...);
+
+bool MathmaniaErrorFormat(MathmaniaError error, char **out);
+
+void MathmaniaErrorFree(MathmaniaError *error);
 
 #endif
