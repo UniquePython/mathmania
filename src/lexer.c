@@ -41,15 +41,8 @@ static inline char peek(Lexer *lexer)
 
 static void skipWhitespace(Lexer *lexer)
 {
-    while (!atEnd(lexer))
-    {
-        char c = peek(lexer);
-
-        if (isWhitespace(c))
-            break;
-
+    while (!atEnd(lexer) && isWhitespace(peek(lexer)))
         lexer->position++;
-    }
 }
 
 static void skipComment(Lexer *lexer)
